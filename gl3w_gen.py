@@ -31,6 +31,8 @@ from __future__ import print_function
 import argparse
 import os
 import re
+import ssl
+import certifi
 
 # Try to import Python 3 library urllib.request
 # and if it fails, fall back to Python 2 urllib2
@@ -88,7 +90,8 @@ def download(url, dst):
         return
 
     print('Downloading {0}...'.format(dst))
-    web = urllib2.urlopen(urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'}))
+    certifi_ctx = ssl.create_default_context(cafile=certifi.where())
+    web = urllib2.urlopen(urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'}), context=certifi_ctx)
     with open(dst, 'wb') as f:
         f.writelines(web.readlines())
 
