@@ -102,21 +102,20 @@ parser.add_argument('--src', type=str, default='', help='Source directory')
 args = parser.parse_args()
 
 # Create directories
-touch_dir(os.path.join(args.include, 'GL'))
-touch_dir(os.path.join(args.include, 'KHR'))
-touch_dir(args.src)
+touch_dir(os.path.join(args.include, 'gl3w'))
+touch_dir(os.path.join(args.src, 'gl3w'))
 
 # Download glcorearb.h and khrplatform.h
 download('https://registry.khronos.org/OpenGL/api/GL/glcorearb.h',
-         os.path.join(args.include, 'GL/glcorearb.h'))
+         os.path.join(args.include, 'gl3w/glcorearb.h'))
 download('https://registry.khronos.org/EGL/api/KHR/khrplatform.h',
-         os.path.join(args.include, 'KHR/khrplatform.h'))
+         os.path.join(args.include, 'gl3w/khrplatform.h'))
 
 # Parse function names from glcorearb.h
 print('Parsing glcorearb.h header...')
 procs = []
 p = re.compile(r'GLAPI.*APIENTRY\s+(\w+)')
-with open(os.path.join(args.include, 'GL/glcorearb.h'), 'r') as f:
+with open(os.path.join(args.include, 'gl3w/glcorearb.h'), 'r') as f:
     for line in f:
         m = p.match(line)
         if not m:
@@ -127,8 +126,8 @@ with open(os.path.join(args.include, 'GL/glcorearb.h'), 'r') as f:
 procs.sort()
 
 # Generate gl3w.h
-print('Generating {0}...'.format(os.path.join(args.include, 'GL/gl3w.h')))
-with open(os.path.join(args.include, 'GL/gl3w.h'), 'wb') as f:
+print('Generating {0}...'.format(os.path.join(args.include, 'gl3w/gl3w.h')))
+with open(os.path.join(args.include, 'gl3w/gl3w.h'), 'wb') as f:
     write(f, UNLICENSE)
     write(f, r'''#ifndef __gl3w_h_
 #define __gl3w_h_
@@ -186,7 +185,7 @@ GL3W_API extern union GL3WProcs gl3wProcs;
 ''')
 
 # Generate gl3w.c
-print('Generating {0}...'.format(os.path.join(args.src, 'gl3w.c')))
+print('Generating {0}...'.format(os.path.join(args.src, 'gl3w/gl3w.c')))
 with open(os.path.join(args.src, 'gl3w.c'), 'wb') as f:
     write(f, UNLICENSE)
     write(f, r'''#include <GL/gl3w.h>
