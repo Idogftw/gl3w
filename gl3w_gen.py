@@ -98,41 +98,42 @@ def download(url, dst):
 parser = argparse.ArgumentParser(description='gl3w generator script')
 parser.add_argument('--ext', action='store_true', help='Load extensions')
 parser.add_argument('--include', type=str, default='include/', help='Include directory')
-parser.add_argument('--src', type=str, default='', help='Source directory')
+parser.add_argument('--src', type=str, default='src/', help='Source directory')
 args = parser.parse_args()
 
 # Create directories
-touch_dir(os.path.join(args.include, 'gl3w'))
-touch_dir(os.path.join(args.src, 'gl3w'))
+touch_dir(args.include)
+touch_dir(os.path.join(args.include, 'KHR'))
+touch_dir(args.src)
 
 # Download glcorearb.h and khrplatform.h
 download('https://registry.khronos.org/OpenGL/api/GL/glcorearb.h',
-         os.path.join(args.include, 'gl3w/glcorearb.h'))
+         os.path.join(args.include, 'glcorearb.h'))
 download('https://registry.khronos.org/EGL/api/KHR/khrplatform.h',
-         os.path.join(args.include, 'gl3w/khrplatform.h'))
+         os.path.join(args.include, 'KHR/khrplatform.h'))
 
 # Parse function names from glcorearb.h
 print('Parsing glcorearb.h header...')
 procs = []
 p = re.compile(r'GLAPI.*APIENTRY\s+(\w+)')
-with open(os.path.join(args.include, 'gl3w/glcorearb.h'), 'r') as f:
-    for line in f:
-        m = p.match(line)
-        if not m:
-            continue
-        proc = m.group(1)
-        if args.ext or not is_ext(proc):
-            procs.append(proc)
+with open(os.path.join(args.include, 'glcorearb.h'), 'r') as f:
+	for line in f:
+		m = p.match(line)
+		if not m:
+			continue
+		proc = m.group(1)
+		if args.ext or not is_ext(proc):
+			procs.append(proc)
 procs.sort()
 
 # Generate gl3w.h
-print('Generating {0}...'.format(os.path.join(args.include, 'gl3w/gl3w.h')))
-with open(os.path.join(args.include, 'gl3w/gl3w.h'), 'wb') as f:
+print('Generating {0}...'.format(os.path.join(args.include, 'gl3w.h')))
+with open(os.path.join(args.include, 'gl3w.h'), 'wb') as f:
     write(f, UNLICENSE)
     write(f, r'''#ifndef __gl3w_h_
 #define __gl3w_h_
 
-#include <GL/glcorearb.h>
+#include <glcorearb.h>
 
 #ifndef GL3W_API
 #define GL3W_API
@@ -185,10 +186,10 @@ GL3W_API extern union GL3WProcs gl3wProcs;
 ''')
 
 # Generate gl3w.c
-print('Generating {0}...'.format(os.path.join(args.src, 'gl3w/gl3w.c')))
-with open(os.path.join(args.src, 'gl3w/gl3w.c'), 'wb') as f:
+print('Generating {0}...'.format(os.path.join(args.src, 'gl3w.c')))
+with open(os.path.join(args.src, 'gl3w.c'), 'wb') as f:
     write(f, UNLICENSE)
-    write(f, r'''#include <GL/gl3w.h>
+    write(f, r'''#include <gl3w.h>
 #include <stdlib.h>
 
 #define ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
