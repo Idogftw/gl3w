@@ -186,7 +186,7 @@ GL3W_API extern union GL3WProcs gl3wProcs;
 
 # Generate gl3w.c
 print('Generating {0}...'.format(os.path.join(args.src, 'gl3w/gl3w.c')))
-with open(os.path.join(args.src, 'gl3w.c'), 'wb') as f:
+with open(os.path.join(args.src, 'gl3w/gl3w.c'), 'wb') as f:
     write(f, UNLICENSE)
     write(f, r'''#include <GL/gl3w.h>
 #include <stdlib.h>
